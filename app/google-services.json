@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "631770979061",
+    "project_id": "care-circle-cdb06",
+    "storage_bucket": "care-circle-cdb06.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:631770979061:android:1d07ba0e206e0c355c03bc",
+        "android_client_info": {
+          "package_name": "com.example.carecircle"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXv_EB2B64790ZAAnNg2oOENAWsqhTgcA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
