@@ -69,7 +69,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:hint="Full Name"
-            android:textColor="#CFCFCF" />
+            android:textColor="#130909" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <RadioGroup
@@ -117,7 +117,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:hint="Email"
-            android:textColor="#CFCFCF" />
+            android:textColor="#130909" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -139,7 +139,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:hint="Number"
-            android:textColor="#CFCFCF" />
+            android:textColor="#130909" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -162,7 +162,7 @@
             android:gravity="center"
             android:hint="Password"
             android:inputType="textPassword"
-            android:textColor="#CFCFCF" />
+            android:textColor="#130909"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -185,7 +185,7 @@
             android:gravity="center"
             android:hint="Confirm Password"
             android:inputType="textPassword"
-            android:textColor="#CFCFCF" />
+            android:textColor="#130909" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <RadioGroup
