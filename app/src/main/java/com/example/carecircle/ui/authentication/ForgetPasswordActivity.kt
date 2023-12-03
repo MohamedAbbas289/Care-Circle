@@ -1,14 +1,12 @@
 package com.example.carecircle.ui.authentication
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
-import com.example.carecircle.R
+import androidx.appcompat.app.AppCompatActivity
 import com.example.carecircle.databinding.ActivityForgetPasswordBinding
-import com.example.carecircle.databinding.ActivitySignUpBinding
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -26,6 +24,9 @@ class ForgetPasswordActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
+        binding.btnForgotPasswordBack.setOnClickListener {
+            finish()
+        }
         auth = Firebase.auth
         checkEmail()
     }
