@@ -4,10 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.carecircle.R
 import com.example.carecircle.databinding.FragmentCategoriesBinding
 import com.example.carecircle.model.CategoryData
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 class CategoriesFragment : Fragment() {
     private lateinit var binding: FragmentCategoriesBinding
@@ -24,7 +32,12 @@ class CategoriesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        showDataFromFireBase()
         initRecyclerView()
+        adapter.onItemClickListener =
+            CategoriesAdapter.OnItemClickListener { position, category ->
+                showSpecificCategory(category)
+            }
     }
 
     private fun initRecyclerView() {
@@ -40,5 +53,38 @@ class CategoriesFragment : Fragment() {
         categories.add(CategoryData("Dentist", R.drawable.dentist_img))
         adapter = CategoriesAdapter(categories)
         binding.categoriesList.adapter = adapter
+    }
+
+    private fun showDataFromFireBase() {
+        val databaseReference: DatabaseReference =
+            FirebaseDatabase.getInstance().getReference("users").child((Firebase.auth.uid!!))
+
+        databaseReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val name = snapshot.child("userName").getValue(String::class.java)
+                binding.userName.text = name
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // show error
+                Toast.makeText(requireContext(), error.message, Toast.LENGTH_LONG).show()
+            }
+
+        })
+    }
+
+    private fun showSpecificCategory(category: String) {
+        // Create a bundle to pass data to SpecificCategoryFragment
+        val bundle = Bundle()
+        bundle.putString("category", category)
+
+        // Navigate to SpecificCategoryFragment
+        val specificCategoryFragment = SpecificCategoryFragment()
+        specificCategoryFragment.arguments = bundle
+
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, specificCategoryFragment)
+            .addToBackStack(null)
+            .commit()
     }
 }

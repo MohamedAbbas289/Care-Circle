@@ -23,13 +23,16 @@ class CategoriesAdapter(val categories: ArrayList<CategoryData>) :
             val category: CategoryData = categories[position]
             binding.categoryImg.setImageResource(category.imgId)
             binding.categoryTxt.text = category.name
+            binding.root.setOnClickListener {
+                onItemClickListener?.onItemClick(position, category.name)
+            }
         }
     }
 
     var onItemClickListener: OnItemClickListener? = null
 
     fun interface OnItemClickListener {
-        fun onItemClick(position: Int, category: String, userId: String)
+        fun onItemClick(position: Int, category: String)
     }
 
 }
