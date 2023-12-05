@@ -14,6 +14,7 @@ import com.example.carecircle.ui.patients.main.MainActivity
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -66,69 +67,84 @@ class SignUpActivity : AppCompatActivity() {
                 if (it.isSuccessful) {
                     val user: FirebaseUser? = auth.currentUser
                     val userId: String = user!!.uid
-                    databaseRefrence =
-                        FirebaseDatabase.getInstance().getReference("users").child(userId)
-                    var hashMap: HashMap<String, String> = HashMap()
-                    FirebaseMessaging.getInstance().token.addOnCompleteListener { token ->
-                        if (token.isSuccessful) {
-                            hashMap.put("userId", userId)
-                            hashMap.put("userName", userName)
-                            hashMap.put("email", email)
-                            hashMap.put("profileImage", "")
-                            hashMap.put("gender", gender)
-                            hashMap.put("userType", userType)
-                            hashMap.put("phoneNumber", phoneNumber)
-                            hashMap["token"] = token.result
-                            databaseRefrence.setValue(hashMap).addOnCompleteListener(this) {
-                                if (it.isSuccessful) {
-                                    // Fetch user data from the database
-                                    databaseRefrence.addListenerForSingleValueEvent(object :
-                                        ValueEventListener {
-                                        override fun onDataChange(snapshot: DataSnapshot) {
-                                            val userTypeFromDatabase = snapshot.child("userType")
-                                                .getValue(String::class.java)
+                    // Set the display name
+                    val profileUpdates = UserProfileChangeRequest.Builder()
+                        .setDisplayName(userName)
+                        .build()
+                    // Apply the display name to the current user
+                    user?.updateProfile(profileUpdates)
+                        ?.addOnCompleteListener { profileUpdateTask ->
+                            if (profileUpdateTask.isSuccessful) {
+                                databaseRefrence =
+                                    FirebaseDatabase.getInstance().getReference("users")
+                                        .child(userId)
+                                var hashMap: HashMap<String, String> = HashMap()
+                                FirebaseMessaging.getInstance().token.addOnCompleteListener { token ->
+                                    if (token.isSuccessful) {
+                                        hashMap.put("userId", userId)
+                                        hashMap.put("userName", userName)
+                                        hashMap.put("email", email)
+                                        hashMap.put("profileImage", "")
+                                        hashMap.put("gender", gender)
+                                        hashMap.put("userType", userType)
+                                        hashMap.put("phoneNumber", phoneNumber)
+                                        hashMap["token"] = token.result
+                                        databaseRefrence.setValue(hashMap)
+                                            .addOnCompleteListener(this) {
+                                                if (it.isSuccessful) {
+                                                    // Fetch user data from the database
+                                                    databaseRefrence.addListenerForSingleValueEvent(
+                                                        object :
+                                                            ValueEventListener {
+                                                            override fun onDataChange(snapshot: DataSnapshot) {
+                                                                val userTypeFromDatabase =
+                                                                    snapshot.child("userType")
+                                                                        .getValue(String::class.java)
 
-                                            // Check user type after fetching it from the database
-                                            if (userTypeFromDatabase == "Doctor") {
-                                                val intent = Intent(
-                                                    this@SignUpActivity,
-                                                    CategorySelectionActivity::class.java
-                                                )
-                                                startActivity(intent)
-                                            } else if (userTypeFromDatabase == "Patient") {
-                                                val intent = Intent(
-                                                    this@SignUpActivity,
-                                                    MainActivity::class.java
-                                                )
-                                                startActivity(intent)
+                                                                // Check user type after fetching it from the database
+                                                                if (userTypeFromDatabase == "Doctor") {
+                                                                    val intent = Intent(
+                                                                        this@SignUpActivity,
+                                                                        CategorySelectionActivity::class.java
+                                                                    )
+                                                                    startActivity(intent)
+                                                                } else if (userTypeFromDatabase == "Patient") {
+                                                                    val intent = Intent(
+                                                                        this@SignUpActivity,
+                                                                        MainActivity::class.java
+                                                                    )
+                                                                    startActivity(intent)
+                                                                }
+
+                                                                Toast.makeText(
+                                                                    this@SignUpActivity,
+                                                                    "Successfully made account",
+                                                                    Toast.LENGTH_LONG
+                                                                ).show()
+                                                                finish()
+                                                            }
+
+                                                            override fun onCancelled(error: DatabaseError) {
+                                                                Toast.makeText(
+                                                                    this@SignUpActivity,
+                                                                    "Failed to fetch user data",
+                                                                    Toast.LENGTH_LONG
+                                                                ).show()
+                                                            }
+                                                        })
+                                                } else {
+                                                    Toast.makeText(
+                                                        this@SignUpActivity,
+                                                        "Failed to save user data",
+                                                        Toast.LENGTH_LONG
+                                                    ).show()
+                                                }
                                             }
-
-                                            Toast.makeText(
-                                                this@SignUpActivity,
-                                                "Successfully made account",
-                                                Toast.LENGTH_LONG
-                                            ).show()
-                                            finish()
-                                        }
-
-                                        override fun onCancelled(error: DatabaseError) {
-                                            Toast.makeText(
-                                                this@SignUpActivity,
-                                                "Failed to fetch user data",
-                                                Toast.LENGTH_LONG
-                                            ).show()
-                                        }
-                                    })
-                                } else {
-                                    Toast.makeText(
-                                        this@SignUpActivity,
-                                        "Failed to save user data",
-                                        Toast.LENGTH_LONG
-                                    ).show()
+                                    }
                                 }
                             }
                         }
-                    }
+
                 } else {
                     Toast.makeText(
                         this@SignUpActivity,
