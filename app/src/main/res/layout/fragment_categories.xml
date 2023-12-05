@@ -42,14 +42,15 @@
             android:textSize="18sp" />
 
         <TextView
+            android:id="@+id/user_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="70dp"
             android:layout_marginTop="24dp"
-            android:text="User Name"
             android:textColor="#707070"
             android:textSize="28sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="User Name" />
     </androidx.cardview.widget.CardView>
 
     <EditText
