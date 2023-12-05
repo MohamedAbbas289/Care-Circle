@@ -31,6 +31,14 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
         loadingProgressBar = binding.loadingProgressBar
         initViews()
+        binding.forgetPassword.setOnClickListener {
+            navigateToForgetPasswordActivity()
+        }
+    }
+
+    private fun navigateToForgetPasswordActivity() {
+        val intent = Intent(this,ForgetPasswordActivity::class.java)
+        startActivity(intent)
     }
 
     private fun checkAllFields(): Boolean {
