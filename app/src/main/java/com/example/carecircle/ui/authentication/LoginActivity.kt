@@ -11,6 +11,7 @@ import com.example.carecircle.databinding.ActivityLoginBinding
 import com.example.carecircle.ui.doctors.main.DocMainActivity
 import com.example.carecircle.ui.patients.main.MainActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -21,6 +22,7 @@ private const val TAG = "LoginActivity"
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
+    private lateinit var firebaseUser: FirebaseUser
     private lateinit var binding: ActivityLoginBinding
     private lateinit var loadingProgressBar: ProgressBar
     private lateinit var databaseReference: DatabaseReference
@@ -34,6 +36,7 @@ class LoginActivity : AppCompatActivity() {
         binding.forgetPassword.setOnClickListener {
             navigateToForgetPasswordActivity()
         }
+        autoLogin()
     }
 
     private fun navigateToForgetPasswordActivity() {
@@ -61,6 +64,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun initViews() {
         auth = FirebaseAuth.getInstance()
+
         databaseReference = FirebaseDatabase.getInstance().getReference("users")
 
         binding.createAccountBtn.setOnClickListener {
@@ -132,6 +136,24 @@ class LoginActivity : AppCompatActivity() {
 
         // Show or hide the progress bar based on the enabled parameter
         loadingProgressBar.visibility = if (enabled) View.GONE else View.VISIBLE
+    }
+
+    private fun autoLogin() {
+        // Check if the user is already logged in
+        if (auth.currentUser != null) {
+            val email = auth.currentUser?.email ?: return
+
+            // Initialize binding if it is null
+            if (!::binding.isInitialized) {
+                binding = ActivityLoginBinding.inflate(layoutInflater)
+                setContentView(binding.root)
+                loadingProgressBar = binding.loadingProgressBar
+                initViews()
+            }
+
+            // Check user type and navigate accordingly
+            checkUserTypeAndNavigate(email)
+        }
     }
 
 
