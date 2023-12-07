@@ -15,6 +15,9 @@
         android:theme="@style/Theme.CareCircle"
         tools:targetApi="31">
         <activity
+            android:name=".ui.patients.main.DoctorConnectionActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.patients.main.tabs.profile.EditProfileActivity"
             android:exported="false" />
         <activity

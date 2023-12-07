@@ -29,5 +29,17 @@ class TopDoctorsAdapter(val doctorsList: MutableList<Doctor>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = doctorsList[position]
         holder.bind(item)
+        if (onItemClickListener != null) {
+            holder.itemBinding.root.setOnClickListener {
+                onItemClickListener?.onItemClick(position, item.id!!)
+            }
+        }
+
+    }
+
+    var onItemClickListener: OnItemClickListener? = null
+
+    fun interface OnItemClickListener {
+        fun onItemClick(position: Int, docId: String)
     }
 }

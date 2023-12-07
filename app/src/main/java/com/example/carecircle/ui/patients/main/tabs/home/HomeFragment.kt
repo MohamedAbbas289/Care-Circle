@@ -1,5 +1,6 @@
 package com.example.carecircle.ui.patients.main.tabs.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
@@ -16,6 +17,7 @@ import com.example.carecircle.R
 import com.example.carecircle.databinding.FragmentHomeBinding
 import com.example.carecircle.model.CategoryData
 import com.example.carecircle.model.Doctor
+import com.example.carecircle.ui.patients.main.DoctorConnectionActivity
 import com.example.carecircle.ui.patients.main.tabs.categories.CategoriesAdapter
 import com.example.carecircle.ui.patients.main.tabs.categories.CategoriesFragment
 import com.example.carecircle.ui.patients.main.tabs.categories.SpecificCategoryFragment
@@ -43,6 +45,8 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        doctorsAadapter = TopDoctorsAdapter(mutableListOf()) // Initialize with an empty list
+        binding.doctorsRecycler.adapter = doctorsAadapter
         underLineText()
         initRecyclerView()
         fetchDataFromDatabase()
@@ -55,7 +59,17 @@ class HomeFragment : Fragment() {
             CategoriesAdapter.OnItemClickListener { position, category ->
                 showSpecificCategory(category)
             }
+        doctorsAadapter.onItemClickListener =
+            TopDoctorsAdapter.OnItemClickListener { position, docId ->
+                navigateToDoctorConnectionActivity(docId)
+            }
 
+    }
+
+    private fun navigateToDoctorConnectionActivity(docId: String) {
+        val intent = Intent(requireContext(), DoctorConnectionActivity::class.java)
+        intent.putExtra("DOCTOR_ID", docId)
+        startActivity(intent)
     }
 
 
@@ -137,9 +151,10 @@ class HomeFragment : Fragment() {
                         doctorList.add(doctor)
                     }
                 }
-                doctorsAadapter = TopDoctorsAdapter(doctorList)
-
-                binding.doctorsRecycler.adapter = doctorsAadapter
+                // Update the data in the adapter
+                doctorsAadapter.doctorsList.clear()
+                doctorsAadapter.doctorsList.addAll(doctorList)
+                doctorsAadapter.notifyDataSetChanged()
 
             }
 
