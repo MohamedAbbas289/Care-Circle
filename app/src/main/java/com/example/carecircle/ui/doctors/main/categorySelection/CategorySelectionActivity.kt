@@ -18,7 +18,7 @@ class CategorySelectionActivity : AppCompatActivity() {
     var categories = listOf(
         "Cardiologist",
         "Dermatologist",
-        "Orthopedic Surgeon",
+        "Orthopedic",
         "Gynecologist",
         "Pediatrician",
         "Neurologist",
