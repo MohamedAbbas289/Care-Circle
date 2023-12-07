@@ -26,6 +26,7 @@ class EditProfileActivity : AppCompatActivity() {
 
         binding.save.setOnClickListener {
             update()
+            finish()
         }
     }
     private fun update() {
