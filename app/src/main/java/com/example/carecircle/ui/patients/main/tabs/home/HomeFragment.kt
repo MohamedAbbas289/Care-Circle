@@ -18,6 +18,7 @@ import com.example.carecircle.model.CategoryData
 import com.example.carecircle.model.Doctor
 import com.example.carecircle.ui.patients.main.tabs.categories.CategoriesAdapter
 import com.example.carecircle.ui.patients.main.tabs.categories.CategoriesFragment
+import com.example.carecircle.ui.patients.main.tabs.categories.SpecificCategoryFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -50,6 +51,10 @@ class HomeFragment : Fragment() {
             navigateToCategoryFragment()
         }
         bindUserName()
+        adapter.onItemClickListener =
+            CategoriesAdapter.OnItemClickListener { position, category ->
+                showSpecificCategory(category)
+            }
 
     }
 
@@ -159,6 +164,21 @@ class HomeFragment : Fragment() {
                 Log.d("YourFragment", "Username is null")
             }
         }
+    }
+
+    private fun showSpecificCategory(category: String) {
+        // Create a bundle to pass data to SpecificCategoryFragment
+        val bundle = Bundle()
+        bundle.putString("category", category)
+
+        // Navigate to SpecificCategoryFragment
+        val specificCategoryFragment = SpecificCategoryFragment()
+        specificCategoryFragment.arguments = bundle
+
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, specificCategoryFragment)
+            .addToBackStack(null)
+            .commit()
     }
 
 
