@@ -36,7 +36,6 @@ class LoginActivity : AppCompatActivity() {
         binding.forgetPassword.setOnClickListener {
             navigateToForgetPasswordActivity()
         }
-        autoLogin()
     }
 
     private fun navigateToForgetPasswordActivity() {
@@ -138,23 +137,6 @@ class LoginActivity : AppCompatActivity() {
         loadingProgressBar.visibility = if (enabled) View.GONE else View.VISIBLE
     }
 
-    private fun autoLogin() {
-        // Check if the user is already logged in
-        if (auth.currentUser != null) {
-            val email = auth.currentUser?.email ?: return
-
-            // Initialize binding if it is null
-            if (!::binding.isInitialized) {
-                binding = ActivityLoginBinding.inflate(layoutInflater)
-                setContentView(binding.root)
-                loadingProgressBar = binding.loadingProgressBar
-                initViews()
-            }
-
-            // Check user type and navigate accordingly
-            checkUserTypeAndNavigate(email)
-        }
-    }
 
 
 }
