@@ -1,12 +1,15 @@
 package com.example.carecircle.ui.patients.main.tabs.profile
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.example.carecircle.databinding.FragmentProfileBinding
 import com.example.carecircle.ui.authentication.LoginActivity
 import com.google.firebase.Firebase
@@ -18,9 +21,11 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
+import retrofit2.http.Url
 
 class ProfileFragment : Fragment() {
     private lateinit var binding: FragmentProfileBinding
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,6 +53,7 @@ class ProfileFragment : Fragment() {
                 binding.userName.text = name
                 binding.userEmail.text = email
             }
+
 
             override fun onCancelled(error: DatabaseError) {
                 // show error
