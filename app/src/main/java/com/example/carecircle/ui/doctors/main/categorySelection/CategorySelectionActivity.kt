@@ -68,6 +68,8 @@ class CategorySelectionActivity : AppCompatActivity() {
                         "Category and rating saved successfully",
                         Toast.LENGTH_SHORT
                     ).show()
+
+                    // Navigate to DocMainActivity only if the category is saved
                     intent = Intent(this@CategorySelectionActivity, DocMainActivity::class.java)
                     startActivity(intent)
                     finish()
@@ -80,4 +82,5 @@ class CategorySelectionActivity : AppCompatActivity() {
                 }
             }
     }
+
 }
