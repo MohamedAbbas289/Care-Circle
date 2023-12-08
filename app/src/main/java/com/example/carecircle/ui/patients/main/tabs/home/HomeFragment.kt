@@ -127,6 +127,10 @@ class HomeFragment : Fragment() {
         binding.seeAllTextView.text = spannableString
     }
 
+    // Inside your HomeFragment class
+
+// ...
+
     private fun fetchDataFromDatabase() {
         val databaseReference: DatabaseReference =
             FirebaseDatabase.getInstance().getReference("users")
@@ -146,23 +150,35 @@ class HomeFragment : Fragment() {
                         val speciality = userSnapshot.child("category").getValue(String::class.java)
                         val rating = userSnapshot.child("rating").getValue(Float::class.java)
 
-                        // Create a Doctor object and add it to the list
-                        val doctor = Doctor(name, id, speciality, rating!!)
-                        doctorList.add(doctor)
+                        // Check for null values before creating a Doctor object
+                        if (name != null && id != null && speciality != null && rating != null) {
+                            // Create a Doctor object and add it to the list
+                            val doctor = Doctor(name, id, speciality, rating)
+                            doctorList.add(doctor)
+                        } else {
+                            // Log a message or handle the case when data is missing
+                            Log.e("HomeFragment", "Doctor data is null or incomplete")
+                        }
                     }
                 }
                 // Update the data in the adapter
                 doctorsAadapter.doctorsList.clear()
                 doctorsAadapter.doctorsList.addAll(doctorList)
                 doctorsAadapter.notifyDataSetChanged()
-
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
                 // Handle errors
+                Log.e(
+                    "HomeFragment",
+                    "Error fetching data from the database: ${databaseError.message}"
+                )
             }
         })
     }
+
+// ...
+
 
     private fun bindUserName() {
         val currentUser = FirebaseAuth.getInstance().currentUser
