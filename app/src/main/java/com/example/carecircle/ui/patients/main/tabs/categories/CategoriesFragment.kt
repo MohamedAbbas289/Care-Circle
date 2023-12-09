@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.example.carecircle.R
 import com.example.carecircle.databinding.FragmentCategoriesBinding
 import com.example.carecircle.model.CategoryData
@@ -33,11 +34,31 @@ class CategoriesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         showDataFromFireBase()
+        initProfileImage()
         initRecyclerView()
         adapter.onItemClickListener =
             CategoriesAdapter.OnItemClickListener { position, category ->
                 showSpecificCategory(category)
             }
+    }
+
+    private fun initProfileImage() {
+        val databaseReference: DatabaseReference =
+            FirebaseDatabase.getInstance().getReference("users").child((Firebase.auth.uid!!))
+        databaseReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (isAdded) {
+                    val profileImage = snapshot.child("profileImage").getValue(String::class.java)
+                    Glide.with(this@CategoriesFragment)
+                        .load(profileImage)
+                        .placeholder(R.drawable.profile_pic)
+                        .into(binding.profileImage)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
     }
 
     private fun initRecyclerView() {
