@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
+import com.example.carecircle.R
 import com.example.carecircle.databinding.FragmentProfileBinding
 import com.example.carecircle.ui.authentication.LoginActivity
 import com.google.firebase.Firebase
@@ -17,10 +19,10 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.database
 
 class ProfileFragment : Fragment() {
     private lateinit var binding: FragmentProfileBinding
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,6 +51,7 @@ class ProfileFragment : Fragment() {
                 binding.userEmail.text = email
             }
 
+
             override fun onCancelled(error: DatabaseError) {
                 // show error
                 Toast.makeText(requireContext(), error.message, Toast.LENGTH_LONG).show()
@@ -65,9 +68,26 @@ class ProfileFragment : Fragment() {
         }
         binding.logout.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
-           navigateToLoginPage()
+            navigateToLoginPage()
 
         }
+        val databaseReference: DatabaseReference =
+            FirebaseDatabase.getInstance().getReference("users").child((Firebase.auth.uid!!))
+        databaseReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (isAdded) { // Check if the fragment is attached
+                    val profileImage = snapshot.child("profileImage").getValue(String::class.java)
+                    Glide.with(this@ProfileFragment)
+                        .load(profileImage)
+                        .placeholder(R.drawable.profile_pic)
+                        .into(binding.profilePic)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Handle onCancelled
+            }
+        })
     }
 
     private fun navigateToLoginPage() {

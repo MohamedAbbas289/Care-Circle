@@ -24,12 +24,12 @@
         app:layout_constraintTop_toTopOf="@id/background"
         app:layout_constraintVertical_bias="0.1">
 
-        <ImageView
-            android:layout_width="wrap_content"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_image"
+            android:layout_width="45dp"
             android:layout_height="45dp"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="12dp"
-            android:adjustViewBounds="true"
             android:src="@drawable/profile_pic" />
 
         <TextView
@@ -121,6 +121,7 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBaseline_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/top_doc_text"
+        app:layout_constraintBottom_toBottomOf="parent"
         tools:listitem="@layout/doc_item" />
 
 
