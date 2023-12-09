@@ -1,15 +1,14 @@
 package com.example.carecircle.ui.patients.main.tabs.profile
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
+import com.example.carecircle.R
 import com.example.carecircle.databinding.FragmentProfileBinding
 import com.example.carecircle.ui.authentication.LoginActivity
 import com.google.firebase.Firebase
@@ -20,8 +19,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.database
-import retrofit2.http.Url
 
 class ProfileFragment : Fragment() {
     private lateinit var binding: FragmentProfileBinding
@@ -71,9 +68,26 @@ class ProfileFragment : Fragment() {
         }
         binding.logout.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
-           navigateToLoginPage()
+            navigateToLoginPage()
 
         }
+        val databaseReference: DatabaseReference =
+            FirebaseDatabase.getInstance().getReference("users").child((Firebase.auth.uid!!))
+        databaseReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (isAdded) { // Check if the fragment is attached
+                    val profileImage = snapshot.child("profileImage").getValue(String::class.java)
+                    Glide.with(this@ProfileFragment)
+                        .load(profileImage)
+                        .placeholder(R.drawable.profile_pic)
+                        .into(binding.profilePic)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Handle onCancelled
+            }
+        })
     }
 
     private fun navigateToLoginPage() {

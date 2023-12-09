@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
+import com.example.carecircle.R
 import com.example.carecircle.databinding.FragmentDocProfileBinding
 import com.example.carecircle.ui.authentication.LoginActivity
 import com.example.carecircle.ui.patients.main.tabs.profile.EditProfileActivity
@@ -68,6 +70,23 @@ class DocProfileFragment : Fragment() {
             navigateToLoginPage()
 
         }
+        val databaseReference: DatabaseReference =
+            FirebaseDatabase.getInstance().getReference("users").child((Firebase.auth.uid!!))
+        databaseReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (isAdded) { // Check if the fragment is attached
+                    val profileImage = snapshot.child("profileImage").getValue(String::class.java)
+                    Glide.with(this@DocProfileFragment)
+                        .load(profileImage)
+                        .placeholder(R.drawable.profile_pic)
+                        .into(binding.profilePic)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Handle onCancelled
+            }
+        })
     }
 
     private fun navigateToLoginPage() {

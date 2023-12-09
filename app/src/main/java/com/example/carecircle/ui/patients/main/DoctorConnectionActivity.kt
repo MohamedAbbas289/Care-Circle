@@ -6,6 +6,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
+import com.example.carecircle.R
 import com.example.carecircle.databinding.ActivityDoctorConnectionBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -85,6 +87,10 @@ class DoctorConnectionActivity : AppCompatActivity() {
         binding.docName.text = doctor.userName.toString()
         binding.rateBar.rating = doctor.rating!!
         binding.speciality.text = doctor.category.toString()
+        Glide.with(this)
+            .load(doctor.profileImage)
+            .placeholder(R.drawable.profile_pic)
+            .into(binding.profileImage)
         val phoneNumber = doctor.phoneNumber
 
         binding.callIcon.setOnClickListener {

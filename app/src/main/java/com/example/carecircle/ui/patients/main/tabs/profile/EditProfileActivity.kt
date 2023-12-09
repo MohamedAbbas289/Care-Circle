@@ -1,6 +1,5 @@
 package com.example.carecircle.ui.patients.main.tabs.profile
 
-import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -11,18 +10,13 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.carecircle.databinding.ActivityEditProfileBinding
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.firebase.Firebase
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.OnProgressListener
 import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.UploadTask
 import java.io.IOException
 import java.util.UUID
 
@@ -150,28 +144,50 @@ class EditProfileActivity : AppCompatActivity() {
 
     private fun uploadImage() {
         if (filePath != null) {
-            var ref: StorageReference = storageRef.child("image/" + UUID.randomUUID().toString())
+            val ref: StorageReference = storageRef.child("image/" + UUID.randomUUID().toString())
             ref.putFile(filePath!!)
-                .addOnSuccessListener {
-                    val hashMap:HashMap<String,String> = HashMap()
-                        hashMap.put("username",binding.editProfEv.text.toString())
-                    hashMap.put("profileImage","")
-                    refDatabase.updateChildren(hashMap as Map<String,Any>)
-                    binding.progressBar.visibility = View.GONE
-                    Toast.makeText(applicationContext, "uploaded", Toast.LENGTH_SHORT).show()
-                    binding.save.visibility = View.GONE
-                }
+                .addOnSuccessListener { taskSnapshot ->
+                    // Get the download URL
+                    ref.downloadUrl.addOnSuccessListener { downloadUrl ->
+                        // Use the download URL to update the profileImage in the Realtime Database
+                        val hashMap: HashMap<String, Any> = HashMap()
+                        hashMap["profileImage"] = downloadUrl.toString()
+                        refDatabase.updateChildren(hashMap)
 
+                        // Check if the activity is not finishing before interacting with UI
+                        if (!isFinishing) {
+                            binding.progressBar.visibility = View.GONE
+                            Toast.makeText(applicationContext, "Image uploaded", Toast.LENGTH_SHORT)
+                                .show()
+                            binding.save.visibility = View.GONE
+                        }
+                    }.addOnFailureListener {
+                        // Check if the activity is not finishing before interacting with UI
+                        if (!isFinishing) {
+                            binding.progressBar.visibility = View.GONE
+                            Toast.makeText(
+                                applicationContext,
+                                "Failed to get download URL: ${it.localizedMessage}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
                 .addOnFailureListener {
-                    binding.progressBar.visibility = View.GONE
-                    Toast.makeText(
-                        applicationContext,
-                        "failed " + it.localizedMessage,
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    // Check if the activity is not finishing before interacting with UI
+                    if (!isFinishing) {
+                        binding.progressBar.visibility = View.GONE
+                        Toast.makeText(
+                            applicationContext,
+                            "Failed to upload image: ${it.localizedMessage}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
-
+        } else {
+            Toast.makeText(applicationContext, "File path is null", Toast.LENGTH_SHORT).show()
         }
     }
+
 
 }
