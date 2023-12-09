@@ -1,7 +1,10 @@
 package com.example.carecircle.ui.authentication
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Patterns
 import android.view.View
 import android.widget.ProgressBar
@@ -22,6 +25,10 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import java.io.IOException
+import java.util.UUID
 
 
 class SignUpActivity : AppCompatActivity() {
@@ -30,17 +37,29 @@ class SignUpActivity : AppCompatActivity() {
     private lateinit var databaseRefrence: DatabaseReference
     private lateinit var loadingProgressBar: ProgressBar
 
+    private var filePath: Uri? = null
+    private val PICK_IMAGE_REQUEST: Int = 2023
+
+    private lateinit var storage: FirebaseStorage
+    private lateinit var storageRef: StorageReference
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
         loadingProgressBar = binding.loadingProgressBar
+        storage = FirebaseStorage.getInstance()
+        storageRef = storage.reference
         initViews()
     }
 
     private fun initViews() {
         auth = Firebase.auth
+        binding.profilePic.setOnClickListener {
+            chooseImage()
+        }
         binding.signupBtn.setOnClickListener {
+            uploadImage()
             registerUser()
         }
     }
@@ -200,6 +219,74 @@ class SignUpActivity : AppCompatActivity() {
         binding.typeContainer.isEnabled = enabled
         binding.signupBtn.isEnabled = enabled
         loadingProgressBar.visibility = if (enabled) View.GONE else View.VISIBLE
+    }
+
+    private fun chooseImage() {
+        val intent: Intent = Intent()
+        intent.type = "image/*"
+        intent.action = Intent.ACTION_GET_CONTENT
+        startActivityForResult(Intent.createChooser(intent, "Select Image"), PICK_IMAGE_REQUEST)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode != null) {
+            filePath = data!!.data
+            try {
+                var bitmap: Bitmap = MediaStore.Images.Media.getBitmap(contentResolver, filePath)
+                binding.profilePic.setImageBitmap(bitmap)
+                binding.signupBtn.visibility = View.VISIBLE
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun uploadImage() {
+        if (filePath != null) {
+            val ref: StorageReference = storageRef.child("image/" + UUID.randomUUID().toString())
+            ref.putFile(filePath!!)
+                .addOnSuccessListener { taskSnapshot ->
+                    // Get the download URL
+                    ref.downloadUrl.addOnSuccessListener { downloadUrl ->
+                        // Use the download URL to update the profileImage in the Realtime Database
+                        val hashMap: HashMap<String, Any> = HashMap()
+                        hashMap["profileImage"] = downloadUrl.toString()
+                        databaseRefrence.updateChildren(hashMap)
+
+                        // Check if the activity is not finishing before interacting with UI
+                        if (!isFinishing) {
+                            binding.loadingProgressBar.visibility = View.GONE
+                            Toast.makeText(applicationContext, "Image uploaded", Toast.LENGTH_SHORT)
+                                .show()
+                            binding.signupBtn.visibility = View.GONE
+                        }
+                    }.addOnFailureListener {
+                        // Check if the activity is not finishing before interacting with UI
+                        if (!isFinishing) {
+                            binding.loadingProgressBar.visibility = View.GONE
+                            Toast.makeText(
+                                applicationContext,
+                                "Failed to get download URL: ${it.localizedMessage}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+                .addOnFailureListener {
+                    // Check if the activity is not finishing before interacting with UI
+                    if (!isFinishing) {
+                        binding.loadingProgressBar.visibility = View.GONE
+                        Toast.makeText(
+                            applicationContext,
+                            "Failed to upload image: ${it.localizedMessage}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+        } else {
+            Toast.makeText(applicationContext, "File path is null", Toast.LENGTH_SHORT).show()
+        }
     }
 
 
