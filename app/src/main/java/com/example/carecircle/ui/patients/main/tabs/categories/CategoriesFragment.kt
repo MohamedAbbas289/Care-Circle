@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
@@ -17,6 +18,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.util.Locale
 
 class CategoriesFragment : Fragment() {
     private lateinit var binding: FragmentCategoriesBinding
@@ -61,6 +63,23 @@ class CategoriesFragment : Fragment() {
         })
     }
 
+    private fun filterlist(newText: String?) {
+        if (newText != null){
+            val filteredList = ArrayList<CategoryData>()
+            for (i in categories){
+                if (i.name.lowercase(Locale.ROOT).contains(newText)){
+                    filteredList.add(i)
+                }
+            }
+
+            if (filteredList.isEmpty()){
+                Toast.makeText(context,"No Data Found", Toast.LENGTH_SHORT).show()
+            } else{
+                    adapter.setFilteredList(filteredList)
+            }
+        }
+    }
+
     private fun initRecyclerView() {
         categories.add(CategoryData("Cardiologist", R.drawable.cardiologist_img))
         categories.add(CategoryData("Dermatologist", R.drawable.dermatologist_img))
@@ -74,6 +93,20 @@ class CategoriesFragment : Fragment() {
         categories.add(CategoryData("Dentist", R.drawable.dentist_img))
         adapter = CategoriesAdapter(categories)
         binding.categoriesList.adapter = adapter
+
+        // Search view
+        binding.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                filterlist(newText)
+                return true
+            }
+
+
+        })
     }
 
     private fun showDataFromFireBase() {
