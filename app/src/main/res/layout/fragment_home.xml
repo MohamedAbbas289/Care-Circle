@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <ImageView
@@ -53,20 +53,18 @@
             android:textStyle="bold" />
     </androidx.cardview.widget.CardView>
 
-    <EditText
+    <androidx.appcompat.widget.SearchView
         android:id="@+id/search_bar"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="10dp"
-        android:background="@color/white"
-        android:drawableEnd="@drawable/vector"
-        android:hint="Search..."
-        android:paddingHorizontal="12dp"
+        android:layout_height="wrap_content"
         android:textSize="22sp"
+        android:layout_marginTop="15dp"
+        app:iconifiedByDefault="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/profile_bar" />
+        app:layout_constraintTop_toBottomOf="@id/profile_bar"
+        app:queryBackground="@color/white"
+        app:queryHint="Search here...." />
 
     <TextView
         android:id="@+id/categories_textView"
@@ -120,8 +118,8 @@
         android:layout_marginHorizontal="12dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBaseline_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/top_doc_text"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top_doc_text"
         tools:listitem="@layout/doc_item" />
 
 

@@ -9,6 +9,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -30,6 +32,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.util.Locale
 
 
 class HomeFragment : Fragment() {
@@ -37,6 +40,8 @@ class HomeFragment : Fragment() {
     private var categories: ArrayList<CategoryData> = ArrayList()
     lateinit var adapter: CategoriesAdapter
     lateinit var doctorsAadapter: TopDoctorsAdapter
+
+     var  doctorList: MutableList<Doctor> = mutableListOf()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -117,8 +122,36 @@ class HomeFragment : Fragment() {
         categories.add(CategoryData("Dentist", R.drawable.dentist_img))
         adapter = CategoriesAdapter(categories)
         binding.categoriesList.adapter = adapter
+        binding.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                filterlist(newText)
+                return true
+            }
 
 
+        })
+
+    }
+
+    private fun filterlist(newText: String?) {
+        if (newText != null){
+            val filteredList = ArrayList<Doctor>()
+            for (i in doctorList ){
+                if (i.name?.lowercase(Locale.ROOT)?.contains(newText) == true){
+                    filteredList.add(i)
+                }
+            }
+
+            if (filteredList.isEmpty()){
+                Toast.makeText(context,"No Data Found", Toast.LENGTH_SHORT).show()
+            } else{
+                doctorsAadapter.setFilteredList(filteredList)
+            }
+        }
     }
 
     private fun navigateToCategoryFragment() {
@@ -165,7 +198,7 @@ class HomeFragment : Fragment() {
 
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val doctorList: MutableList<Doctor> = mutableListOf()
+
 
                 for (userSnapshot in dataSnapshot.children) {
                     val userType = userSnapshot.child("userType").getValue(String::class.java)

@@ -53,20 +53,27 @@
             tools:text="User Name" />
     </androidx.cardview.widget.CardView>
 
-    <EditText
-        android:id="@+id/search_bar"
+    <LinearLayout
+        android:id="@+id/boxToSearch"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="10dp"
-        android:background="@color/white"
-        android:drawableEnd="@drawable/vector"
-        android:hint="Search..."
+        android:backgroundTint="@color/white"
         android:paddingHorizontal="12dp"
-        android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/profile_bar" />
+        app:layout_constraintTop_toBottomOf="@id/profile_bar">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/search_bar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="22sp"
+            app:iconifiedByDefault="false"
+            app:queryBackground="@color/white"
+            app:queryHint="Search here...." />
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/categories_list"
@@ -79,7 +86,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/search_bar"
+        app:layout_constraintTop_toBottomOf="@id/boxToSearch"
         app:spanCount="2"
         tools:listitem="@layout/category_item" />
 

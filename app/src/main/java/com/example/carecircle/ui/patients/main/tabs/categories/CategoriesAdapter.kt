@@ -6,9 +6,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.carecircle.databinding.CategoryItemBinding
 import com.example.carecircle.model.CategoryData
 
-class CategoriesAdapter(val categories: ArrayList<CategoryData>) :
+class CategoriesAdapter(var categories: List<CategoryData>) :
     RecyclerView.Adapter<CategoriesAdapter.ViewHolder>() {
     class ViewHolder(val binding: CategoryItemBinding) : RecyclerView.ViewHolder(binding.root)
+
+    fun setFilteredList(categories: ArrayList<CategoryData>){
+        this.categories =categories
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding =
