@@ -6,9 +6,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.carecircle.R
 import com.example.carecircle.databinding.ActivityDoctorConnectionBinding
+import com.example.carecircle.ui.patients.main.tabs.chat.ChatInboxActivity
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -22,7 +24,15 @@ class DoctorConnectionActivity : AppCompatActivity() {
         binding = ActivityDoctorConnectionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
         val doctorId = intent.getStringExtra("DOCTOR_ID")
+
+        binding.chatIcon.setOnClickListener {
+            val intent = Intent(this, ChatInboxActivity::class.java).apply {
+                putExtra("DOCTOR_ID", doctorId)
+            }
+            startActivity(intent)
+        }
 
 
         getUserById(doctorId!!) { doctor ->
@@ -100,5 +110,12 @@ class DoctorConnectionActivity : AppCompatActivity() {
                 startActivity(dialIntent)
             }
         }
+    }
+
+    private fun showTabFragment(fragment: Fragment) {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .commit()
     }
 }
