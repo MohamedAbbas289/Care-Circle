@@ -11,7 +11,6 @@ import com.bumptech.glide.Glide
 import com.example.carecircle.R
 import com.example.carecircle.databinding.FragmentChatBinding
 import com.example.carecircle.model.ChatList
-import com.example.carecircle.model.Token
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -21,7 +20,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.iid.FirebaseInstanceId
 
 class ChatFragment : Fragment() {
     private lateinit var binding: FragmentChatBinding
@@ -60,16 +58,11 @@ class ChatFragment : Fragment() {
             }
 
         })
-        updateToken(FirebaseInstanceId.getInstance().token)
+
         initProfileImage()
 
     }
 
-    private fun updateToken(token: String?) {
-        val ref = FirebaseDatabase.getInstance().reference.child("Tokens")
-        val token1 = Token(token!!)
-        ref.child(firebaseUser!!.uid).setValue(token1)
-    }
 
     private fun initProfileImage() {
         val databaseReference: DatabaseReference =
