@@ -11,6 +11,7 @@ import com.bumptech.glide.Glide
 import com.example.carecircle.R
 import com.example.carecircle.databinding.FragmentProfileBinding
 import com.example.carecircle.ui.authentication.LoginActivity
+import com.example.carecircle.ui.patients.main.tabs.profile.myDoctors.MyDoctorsActivity
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -88,12 +89,22 @@ class ProfileFragment : Fragment() {
                 // Handle onCancelled
             }
         })
+
+        binding.doctors.setOnClickListener {
+            navigateToMyDoctorsPage()
+        }
     }
 
     private fun navigateToLoginPage() {
-        val intent = Intent(context,LoginActivity::class.java)
+        val intent = Intent(context, LoginActivity::class.java)
         startActivity(intent)
         requireActivity().finish()
+
+    }
+
+    private fun navigateToMyDoctorsPage() {
+        val intent = Intent(context, MyDoctorsActivity::class.java)
+        startActivity(intent)
 
     }
 
