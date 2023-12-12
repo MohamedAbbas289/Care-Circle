@@ -1,11 +1,13 @@
 package com.example.carecircle.ui.patients.main.tabs.profile.myDoctors
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.carecircle.databinding.ActivityMyDoctorsBinding
 import com.example.carecircle.model.Appointment
 import com.example.carecircle.model.Doctor
+import com.example.carecircle.ui.patients.main.tabs.chat.ChatInboxActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -31,7 +33,10 @@ class MyDoctorsActivity : AppCompatActivity() {
 
         adapter.onItemClickListener = MyDoctorsAdapter
             .OnItemClickListener { position, docId ->
-                // Handle item click here
+                val intent = Intent(this, ChatInboxActivity::class.java).apply {
+                    putExtra("DOCTOR_ID", docId)
+                }
+                startActivity(intent)
             }
 
     }
