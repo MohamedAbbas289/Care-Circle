@@ -12,6 +12,9 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.carecircle.R
 import com.example.carecircle.databinding.ActivityDoctorConnectionBinding
+import com.example.carecircle.model.Appointment
+import com.example.carecircle.ui.patients.main.tabs.chat.ChatInboxActivity
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
