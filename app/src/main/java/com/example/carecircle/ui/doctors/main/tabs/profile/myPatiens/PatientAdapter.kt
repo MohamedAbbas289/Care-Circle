@@ -32,10 +32,20 @@ class PatientAdapter(val patientsList: MutableList<User>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = patientsList[position]
         holder.bind(item)
+        if (onItemClickListener != null) {
+            holder.itemBinding.chatIcon.setOnClickListener {
+                onItemClickListener?.onItemClick(position, item.userId!!)
+            }
+        }
     }
 
     override fun getItemCount(): Int = patientsList.size
 
+    var onItemClickListener: OnItemClickListener? = null
+
+    fun interface OnItemClickListener {
+        fun onItemClick(position: Int, docId: String)
+    }
 }
 
 

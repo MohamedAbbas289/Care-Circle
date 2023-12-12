@@ -25,6 +25,7 @@ class MyDoctorsActivity : AppCompatActivity() {
         initRecycler()
         // Fetch appointments with status "accepted" and patientId equal to the current user id
         fetchAcceptedAppointments()
+
     }
 
     private fun initRecycler() {

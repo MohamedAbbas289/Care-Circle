@@ -1,9 +1,11 @@
 package com.example.carecircle.ui.doctors.main.tabs.profile.myPatiens
 
 import User
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.carecircle.databinding.ActivityMyPatintsBinding
+import com.example.carecircle.ui.patients.main.tabs.chat.ChatInboxActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -22,11 +24,21 @@ class MyPatientsActivity : AppCompatActivity() {
 
         // Fetch accepted appointments where doctorId is equal to the current user's ID
         fetchAcceptedAppointments()
+
+
     }
 
     private fun initRecycler() {
         adapter = PatientAdapter(mutableListOf())
         binding.myPatientsRecyclerView.adapter = adapter
+
+        adapter.onItemClickListener = PatientAdapter
+            .OnItemClickListener { position, docId ->
+                val intent = Intent(this, ChatInboxActivity::class.java).apply {
+                    putExtra("DOCTOR_ID", docId)
+                }
+                startActivity(intent)
+            }
     }
 
     private fun fetchAcceptedAppointments() {
