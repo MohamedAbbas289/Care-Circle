@@ -86,7 +86,7 @@
         app:layout_constraintTop_toBottomOf="@id/notifications" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/doctors"
+        android:id="@+id/myPatients"
         android:layout_width="305dp"
         android:layout_height="54dp"
         android:layout_marginTop="10dp"
@@ -109,7 +109,7 @@
         app:icon="@drawable/share"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/doctors" />
+        app:layout_constraintTop_toBottomOf="@id/myPatients" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/logout"
