@@ -20,18 +20,21 @@ import com.example.carecircle.R
 import com.example.carecircle.databinding.FragmentHomeBinding
 import com.example.carecircle.model.CategoryData
 import com.example.carecircle.model.Doctor
+import com.example.carecircle.model.Token
 import com.example.carecircle.ui.patients.main.DoctorConnectionActivity
 import com.example.carecircle.ui.patients.main.tabs.categories.CategoriesAdapter
 import com.example.carecircle.ui.patients.main.tabs.categories.CategoriesFragment
 import com.example.carecircle.ui.patients.main.tabs.categories.SpecificCategoryFragment
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.iid.FirebaseInstanceId
 import java.util.Locale
 
 
@@ -40,6 +43,7 @@ class HomeFragment : Fragment() {
     private var categories: ArrayList<CategoryData> = ArrayList()
     lateinit var adapter: CategoriesAdapter
     lateinit var doctorsAadapter: TopDoctorsAdapter
+    private var firebaseUser: FirebaseUser? = null
 
      var  doctorList: MutableList<Doctor> = mutableListOf()
     override fun onCreateView(
@@ -54,6 +58,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         doctorsAadapter = TopDoctorsAdapter(mutableListOf()) // Initialize with an empty list
+        firebaseUser = FirebaseAuth.getInstance().currentUser
         binding.doctorsRecycler.adapter = doctorsAadapter
         underLineText()
 
@@ -73,6 +78,7 @@ class HomeFragment : Fragment() {
             TopDoctorsAdapter.OnItemClickListener { position, docId ->
                 navigateToDoctorConnectionActivity(docId)
             }
+        updateToken(FirebaseInstanceId.getInstance().token)
 
     }
 
@@ -273,6 +279,12 @@ class HomeFragment : Fragment() {
             .replace(R.id.fragment_container, specificCategoryFragment)
             .addToBackStack(null)
             .commit()
+    }
+
+    private fun updateToken(token: String?) {
+        val ref = FirebaseDatabase.getInstance().reference.child("Tokens")
+        val token1 = Token(token!!)
+        ref.child(firebaseUser!!.uid).setValue(token1)
     }
 
 
