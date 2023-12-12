@@ -9,6 +9,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -18,18 +20,22 @@ import com.example.carecircle.R
 import com.example.carecircle.databinding.FragmentHomeBinding
 import com.example.carecircle.model.CategoryData
 import com.example.carecircle.model.Doctor
+import com.example.carecircle.model.Token
 import com.example.carecircle.ui.patients.main.DoctorConnectionActivity
 import com.example.carecircle.ui.patients.main.tabs.categories.CategoriesAdapter
 import com.example.carecircle.ui.patients.main.tabs.categories.CategoriesFragment
 import com.example.carecircle.ui.patients.main.tabs.categories.SpecificCategoryFragment
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.iid.FirebaseInstanceId
+import java.util.Locale
 
 
 class HomeFragment : Fragment() {
@@ -37,6 +43,9 @@ class HomeFragment : Fragment() {
     private var categories: ArrayList<CategoryData> = ArrayList()
     lateinit var adapter: CategoriesAdapter
     lateinit var doctorsAadapter: TopDoctorsAdapter
+    private var firebaseUser: FirebaseUser? = null
+
+     var  doctorList: MutableList<Doctor> = mutableListOf()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -49,6 +58,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         doctorsAadapter = TopDoctorsAdapter(mutableListOf()) // Initialize with an empty list
+        firebaseUser = FirebaseAuth.getInstance().currentUser
         binding.doctorsRecycler.adapter = doctorsAadapter
         underLineText()
 
@@ -68,6 +78,7 @@ class HomeFragment : Fragment() {
             TopDoctorsAdapter.OnItemClickListener { position, docId ->
                 navigateToDoctorConnectionActivity(docId)
             }
+        updateToken(FirebaseInstanceId.getInstance().token)
 
     }
 
@@ -117,8 +128,36 @@ class HomeFragment : Fragment() {
         categories.add(CategoryData("Dentist", R.drawable.dentist_img))
         adapter = CategoriesAdapter(categories)
         binding.categoriesList.adapter = adapter
+        binding.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                filterlist(newText)
+                return true
+            }
 
 
+        })
+
+    }
+
+    private fun filterlist(newText: String?) {
+        if (newText != null){
+            val filteredList = ArrayList<Doctor>()
+            for (i in doctorList ){
+                if (i.name?.lowercase(Locale.ROOT)?.contains(newText) == true){
+                    filteredList.add(i)
+                }
+            }
+
+            if (filteredList.isEmpty()){
+                Toast.makeText(context,"No Data Found", Toast.LENGTH_SHORT).show()
+            } else{
+                doctorsAadapter.setFilteredList(filteredList)
+            }
+        }
     }
 
     private fun navigateToCategoryFragment() {
@@ -165,7 +204,7 @@ class HomeFragment : Fragment() {
 
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val doctorList: MutableList<Doctor> = mutableListOf()
+
 
                 for (userSnapshot in dataSnapshot.children) {
                     val userType = userSnapshot.child("userType").getValue(String::class.java)
@@ -240,6 +279,12 @@ class HomeFragment : Fragment() {
             .replace(R.id.fragment_container, specificCategoryFragment)
             .addToBackStack(null)
             .commit()
+    }
+
+    private fun updateToken(token: String?) {
+        val ref = FirebaseDatabase.getInstance().reference.child("Tokens")
+        val token1 = Token(token!!)
+        ref.child(firebaseUser!!.uid).setValue(token1)
     }
 
 

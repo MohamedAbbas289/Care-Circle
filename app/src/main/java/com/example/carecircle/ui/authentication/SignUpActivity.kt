@@ -24,7 +24,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import java.io.IOException
@@ -98,18 +97,18 @@ class SignUpActivity : AppCompatActivity() {
                                     FirebaseDatabase.getInstance().getReference("users")
                                         .child(userId)
                                 var hashMap: HashMap<String, String> = HashMap()
-                                FirebaseMessaging.getInstance().token.addOnCompleteListener { token ->
-                                    if (token.isSuccessful) {
-                                        hashMap.put("userId", userId)
-                                        hashMap.put("userName", userName)
-                                        hashMap.put("email", email)
-                                        hashMap.put("profileImage", "")
-                                        hashMap.put("gender", gender)
-                                        hashMap.put("userType", userType)
-                                        hashMap.put("phoneNumber", phoneNumber)
-                                        hashMap["token"] = token.result
-                                        databaseRefrence.setValue(hashMap)
-                                            .addOnCompleteListener(this) {
+//                                FirebaseInstanceId.getInstance().token.addOnCompleteListener { token ->
+//                                    if (token.isSuccessful) {
+                                hashMap.put("userId", userId)
+                                hashMap.put("userName", userName)
+                                hashMap.put("email", email)
+                                hashMap.put("profileImage", "")
+                                hashMap.put("gender", gender)
+                                hashMap.put("userType", userType)
+                                hashMap.put("phoneNumber", phoneNumber)
+//                                        hashMap["token"] = token.result
+                                databaseRefrence.setValue(hashMap)
+                                    .addOnCompleteListener(this) {
                                                 if (it.isSuccessful) {
                                                     // Fetch user data from the database
                                                     databaseRefrence.addListenerForSingleValueEvent(
@@ -159,8 +158,7 @@ class SignUpActivity : AppCompatActivity() {
                                                     ).show()
                                                 }
                                             }
-                                    }
-                                }
+
                             }
                         }
 

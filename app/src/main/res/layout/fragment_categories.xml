@@ -53,20 +53,23 @@
             tools:text="User Name" />
     </androidx.cardview.widget.CardView>
 
-    <EditText
+
+    <androidx.appcompat.widget.SearchView
         android:id="@+id/search_bar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:background="@color/white"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="10dp"
-        android:background="@color/white"
-        android:drawableEnd="@drawable/vector"
-        android:hint="Search..."
-        android:paddingHorizontal="12dp"
         android:textSize="22sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:iconifiedByDefault="false"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/profile_bar" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/profile_bar"
+        app:queryBackground="@color/white"
+        app:queryHint="Search here...."
+        app:searchIcon="@drawable/search_img" />
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/categories_list"

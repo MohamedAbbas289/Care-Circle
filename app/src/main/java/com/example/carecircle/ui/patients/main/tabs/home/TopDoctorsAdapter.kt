@@ -7,8 +7,9 @@ import com.bumptech.glide.Glide
 import com.example.carecircle.R
 import com.example.carecircle.databinding.DocItemBinding
 import com.example.carecircle.model.Doctor
+import java.util.ArrayList
 
-class TopDoctorsAdapter(val doctorsList: MutableList<Doctor>) :
+class TopDoctorsAdapter(var doctorsList: MutableList<Doctor>) :
     RecyclerView.Adapter<TopDoctorsAdapter.ViewHolder>() {
 
     class ViewHolder(val itemBinding: DocItemBinding) : RecyclerView.ViewHolder(itemBinding.root) {
@@ -41,6 +42,11 @@ class TopDoctorsAdapter(val doctorsList: MutableList<Doctor>) :
             }
         }
 
+    }
+
+    fun setFilteredList(mlist: ArrayList<Doctor>) {
+        this.doctorsList = mlist
+        notifyDataSetChanged()
     }
 
     var onItemClickListener: OnItemClickListener? = null

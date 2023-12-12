@@ -6,10 +6,10 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.carecircle.R
 import com.example.carecircle.databinding.ActivityDocMainBinding
-import com.example.carecircle.ui.doctors.main.tabs.chat.DocChatFragment
 import com.example.carecircle.ui.doctors.main.tabs.home.DocHomeFragment
 import com.example.carecircle.ui.doctors.main.tabs.list.PatientsListFragment
 import com.example.carecircle.ui.doctors.main.tabs.profile.DocProfileFragment
+import com.example.carecircle.ui.patients.main.tabs.chat.ChatFragment
 
 
 class DocMainActivity : AppCompatActivity() {
@@ -32,7 +32,7 @@ class DocMainActivity : AppCompatActivity() {
                     }
 
                     R.id.nav_chat -> {
-                        showTabFragment(DocChatFragment())
+                        showTabFragment(ChatFragment())
                         changeBackgroundColor(R.color.chat_tab_color)
                     }
 
