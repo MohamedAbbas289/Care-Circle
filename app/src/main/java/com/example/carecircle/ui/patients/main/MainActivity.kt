@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
                 try {
                     val command = eventCommand.data
                     val commandName = command.getJSONObject("data").getString("command")
-                    Log.d("AlanButton", "onCommand: commandName: $commandName")
+                    navigateToTabsAlan(commandName)
                 } catch (e: JSONException) {
                     e.message?.let { Log.e("AlanButton", it) }
                 }
@@ -76,12 +76,48 @@ class MainActivity : AppCompatActivity() {
         alanButton?.registerCallback(alanCallback);
     }
 
+    private fun navigateToTabsAlan(commandName: String) {
+        when (commandName) {
+            "Go to home" -> {
+                showTabFragmentAlan(HomeFragment(), R.id.nav_home)
+                changeBackgroundColor(R.color.home_tab_color)
+            }
+
+            "Go to categories" -> {
+                showTabFragmentAlan(CategoriesFragment(), R.id.nav_categories)
+                changeBackgroundColor(R.color.categories_tab_color)
+            }
+
+            "Go to chat" -> {
+                showTabFragmentAlan(ChatFragment(), R.id.nav_chat)
+                changeBackgroundColor(R.color.chat_tab_color)
+            }
+
+            "Go to profile" -> {
+                showTabFragmentAlan(ProfileFragment(), R.id.nav_profile)
+                changeBackgroundColor(R.color.profile_tab_color)
+            }
+        }
+
+    }
+
     private fun showTabFragment(fragment: Fragment) {
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragment_container, fragment)
             .commit()
     }
+
+    private fun showTabFragmentAlan(fragment: Fragment, itemId: Int) {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .commit()
+
+        // Update the selected item in the bottom navigation
+        binding.bottomNav.selectedItemId = itemId
+    }
+
 
     private fun changeBackgroundColor(colorResId: Int) {
         val color = ContextCompat.getColor(this, colorResId)
