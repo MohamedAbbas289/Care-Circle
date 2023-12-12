@@ -1,3 +1,5 @@
 package com.example.carecircle.model
 
-data class Sender(val data: Data, val to: String/*token*/)
+import com.example.carecircle.ui.notification.NewData
+
+data class Sender(val data: NewData, val to: String/*token*/)

@@ -6,12 +6,19 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.carecircle.R
+import com.example.carecircle.api.ApiServer
 import com.example.carecircle.databinding.ActivityChatInboxBinding
 import com.example.carecircle.model.Chat
+import com.example.carecircle.model.MyResponse
+import com.example.carecircle.model.Sender
+import com.example.carecircle.model.Token
+import com.example.carecircle.ui.notification.Client
+import com.example.carecircle.ui.notification.NewData
 import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
@@ -24,6 +31,9 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageTask
 import com.google.firebase.storage.UploadTask
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class ChatInboxActivity : AppCompatActivity() {
     private lateinit var binding: ActivityChatInboxBinding
@@ -33,6 +43,8 @@ class ChatInboxActivity : AppCompatActivity() {
     private var chatList: List<Chat>? = null
     private lateinit var recyclerViewChat: RecyclerView
     var reference: DatabaseReference? = null
+    var notify = false
+    var apiServer: ApiServer? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChatInboxBinding.inflate(layoutInflater)
@@ -40,6 +52,9 @@ class ChatInboxActivity : AppCompatActivity() {
         binding.backBtn.setOnClickListener {
             onBackPressed()
         }
+
+        apiServer =
+            Client.Client.getClient("https://fcm.googleapis.com/")!!.create(ApiServer::class.java)
 
         doctorId = intent.getStringExtra("DOCTOR_ID").toString()
         firebaseUser = FirebaseAuth.getInstance().currentUser!!
@@ -67,14 +82,17 @@ class ChatInboxActivity : AppCompatActivity() {
         })
 
         binding.sendBtn.setOnClickListener {
+            notify = true
             val message = binding.messageTxt.text.toString()
             if (message.isNotBlank()) {
                 sendMessageToUser(firebaseUser.uid, doctorId, message)
                 binding.messageTxt.setText("")
             }
+
         }
 
         binding.attachmentBtn.setOnClickListener {
+            notify = true
             val intent = Intent()
             intent.action = Intent.ACTION_GET_CONTENT
             intent.type = "image/*"
@@ -82,6 +100,8 @@ class ChatInboxActivity : AppCompatActivity() {
         }
         seenMessage(doctorId)
     }
+
+//
 
 
     private fun sendMessageToUser(senderId: String, receiverId: String, message: String) {
@@ -123,12 +143,73 @@ class ChatInboxActivity : AppCompatActivity() {
                             // Handle error
                         }
                     })
-
-                    // implement the push notification using FCM
-                    val reference = FirebaseDatabase.getInstance().reference
-                        .child("users").child(firebaseUser.uid)
                 }
             }
+        // implement the push notification using FCM
+        val userReference = FirebaseDatabase.getInstance().reference
+            .child("users").child(firebaseUser.uid)
+        userReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val user = snapshot.getValue(User::class.java)
+                if (notify) {
+                    sendNotification(doctorId, user!!.userName, message)
+                }
+                notify = false
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+        })
+    }
+
+    private fun sendNotification(doctorId: String, userName: String?, message: String) {
+        val ref = FirebaseDatabase.getInstance().reference.child("Tokens")
+
+        val query = ref.orderByKey().equalTo(doctorId)
+
+        query.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (dataSnapShot in snapshot.children) {
+                    val token: Token? = dataSnapShot.getValue(Token::class.java)
+                    val data = NewData(
+                        firebaseUser.uid,
+                        R.mipmap.ic_launcher,
+                        "$userName: $message",
+                        "New Message",
+                        doctorId
+                    )
+                    val sender = Sender(data, token!!.token.toString())
+
+                    apiServer!!.sendNotification(sender)
+                        .enqueue(object : Callback<MyResponse> {
+                            override fun onResponse(
+                                call: Call<MyResponse>,
+                                response: Response<MyResponse>
+                            ) {
+                                if (response.code() == 200) {
+                                    if (response.body()!!.success != 1) {
+                                        Toast.makeText(
+                                            this@ChatInboxActivity,
+                                            "Failed, nothing happened",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                }
+                            }
+
+                            override fun onFailure(call: Call<MyResponse>, t: Throwable) {
+                                TODO("Not yet implemented")
+                            }
+
+                        })
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -165,8 +246,32 @@ class ChatInboxActivity : AppCompatActivity() {
                     messageHashMap["url"] = url
                     messageHashMap["messageId"] = messageId!!
                     ref.child("chats").child(messageId).setValue(messageHashMap)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                loadingBar.dismiss()
+                                // implement the push notification using FCM
+                                val reference = FirebaseDatabase.getInstance().reference
+                                    .child("users").child(firebaseUser.uid)
+                                reference.addValueEventListener(object : ValueEventListener {
+                                    override fun onDataChange(snapshot: DataSnapshot) {
+                                        val user = snapshot.getValue(User::class.java)
+                                        if (notify) {
+                                            sendNotification(
+                                                doctorId,
+                                                user!!.userName,
+                                                "sent you an image."
+                                            )
+                                        }
+                                        notify = false
+                                    }
 
-                    loadingBar.dismiss()
+                                    override fun onCancelled(error: DatabaseError) {
+                                    }
+
+                                })
+                            }
+                        }
+
                 }
             }
         }
