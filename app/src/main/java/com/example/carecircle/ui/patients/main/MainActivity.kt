@@ -17,9 +17,14 @@ import com.example.carecircle.ui.patients.main.tabs.home.HomeFragment
 import com.example.carecircle.ui.patients.main.tabs.profile.ProfileFragment
 import org.json.JSONException
 
-class MainActivity : AppCompatActivity() {
+interface FragmentCallback {
+    fun onCommandReceived(command: String)
+}
+
+class MainActivity : AppCompatActivity(), FragmentCallback {
     lateinit var binding: ActivityMainBinding
     private var alanButton: AlanButton? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -54,7 +59,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initAlanAi() {
-        /// Define the project key
         val config = AlanConfig.builder()
             .setProjectId("e088f0a59289662fd22f222f500bdc4c2e956eca572e1d8b807a3e2338fdd0dc/stage")
             .build()
@@ -62,21 +66,22 @@ class MainActivity : AppCompatActivity() {
         alanButton?.initWithConfig(config)
 
         val alanCallback: AlanCallback = object : AlanCallback() {
-            /// Handle commands from Alan AI Studio
             override fun onCommand(eventCommand: EventCommand) {
                 try {
                     val command = eventCommand.data
                     val commandName = command.getJSONObject("data").getString("command")
-                    navigateToTabsAlan(commandName)
+                    alanCommands(commandName)
                 } catch (e: JSONException) {
                     e.message?.let { Log.e("AlanButton", it) }
                 }
             }
         }
-        alanButton?.registerCallback(alanCallback);
+        alanButton?.registerCallback(alanCallback)
     }
 
-    private fun navigateToTabsAlan(commandName: String) {
+    private fun alanCommands(commandName: String) {
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
+
         when (commandName) {
             "Go to home" -> {
                 showTabFragmentAlan(HomeFragment(), R.id.nav_home)
@@ -97,11 +102,24 @@ class MainActivity : AppCompatActivity() {
                 showTabFragmentAlan(ProfileFragment(), R.id.nav_profile)
                 changeBackgroundColor(R.color.profile_tab_color)
             }
-        }
 
+
+            else -> {
+                // Pass the command to the current fragment
+                if (currentFragment is FragmentCallback) {
+                    currentFragment.onCommandReceived(commandName)
+                }
+            }
+        }
     }
 
     private fun showTabFragment(fragment: Fragment) {
+        if (fragment is HomeFragment) {
+            (fragment as HomeFragment).setCallback(this)
+        } else if (fragment is CategoriesFragment) {
+            (fragment as CategoriesFragment).setCallback(this)
+        }
+
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragment_container, fragment)
@@ -109,20 +127,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showTabFragmentAlan(fragment: Fragment, itemId: Int) {
+        if (fragment is FragmentCallback) {
+            (fragment as FragmentCallback).onCommandReceived("Go to ${fragment.javaClass.simpleName}")
+        }
+
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragment_container, fragment)
             .commit()
 
-        // Update the selected item in the bottom navigation
         binding.bottomNav.selectedItemId = itemId
     }
-
 
     private fun changeBackgroundColor(colorResId: Int) {
         val color = ContextCompat.getColor(this, colorResId)
         binding.bottomNav.setBackgroundColor(color)
     }
 
-
+    // Implement the FragmentCallback method
+    override fun onCommandReceived(command: String) {
+        alanCommands(command)
+    }
 }
