@@ -4,13 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.SearchView
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.carecircle.R
 import com.example.carecircle.databinding.FragmentCategoriesBinding
 import com.example.carecircle.model.CategoryData
+import com.example.carecircle.ui.patients.main.FragmentCallback
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.database.DataSnapshot
@@ -20,10 +21,11 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.util.Locale
 
-class CategoriesFragment : Fragment() {
+class CategoriesFragment : Fragment(), FragmentCallback {
     private lateinit var binding: FragmentCategoriesBinding
     private var categories: ArrayList<CategoryData> = ArrayList()
     lateinit var adapter: CategoriesAdapter
+    private var callback: FragmentCallback? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -42,6 +44,7 @@ class CategoriesFragment : Fragment() {
             CategoriesAdapter.OnItemClickListener { position, category ->
                 showSpecificCategory(category)
             }
+        setCallback(callback ?: this)
     }
 
     private fun initProfileImage() {
@@ -127,7 +130,7 @@ class CategoriesFragment : Fragment() {
         })
     }
 
-    private fun showSpecificCategory(category: String) {
+    fun showSpecificCategory(category: String) {
         // Create a bundle to pass data to SpecificCategoryFragment
         val bundle = Bundle()
         bundle.putString("category", category)
@@ -140,5 +143,27 @@ class CategoriesFragment : Fragment() {
             .replace(R.id.fragment_container, specificCategoryFragment)
             .addToBackStack(null)
             .commit()
+    }
+
+
+    override fun onCommandReceived(command: String) {
+        if (command.startsWith("I want ") && command.endsWith(" doctors")) {
+            val extractedCategory = command.substring(8, command.length - 8)
+                .trim() // Extract the category and trim whitespace
+            val matchingCategory =
+                categories.firstOrNull { it.name.equals(extractedCategory, ignoreCase = true) }
+
+            if (matchingCategory != null) {
+                showSpecificCategory(matchingCategory.name)
+            } else {
+                // Handle the case where the category is not found
+                Toast.makeText(context, "Category not found", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
+    fun setCallback(callback: FragmentCallback) {
+        this.callback = callback
     }
 }

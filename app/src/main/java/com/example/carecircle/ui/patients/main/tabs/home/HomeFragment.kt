@@ -22,6 +22,7 @@ import com.example.carecircle.model.CategoryData
 import com.example.carecircle.model.Doctor
 import com.example.carecircle.model.Token
 import com.example.carecircle.ui.patients.main.DoctorConnectionActivity
+import com.example.carecircle.ui.patients.main.FragmentCallback
 import com.example.carecircle.ui.patients.main.tabs.categories.CategoriesAdapter
 import com.example.carecircle.ui.patients.main.tabs.categories.CategoriesFragment
 import com.example.carecircle.ui.patients.main.tabs.categories.SpecificCategoryFragment
@@ -38,14 +39,15 @@ import com.google.firebase.iid.FirebaseInstanceId
 import java.util.Locale
 
 
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), FragmentCallback {
     private lateinit var binding: FragmentHomeBinding
     private var categories: ArrayList<CategoryData> = ArrayList()
     lateinit var adapter: CategoriesAdapter
     lateinit var doctorsAadapter: TopDoctorsAdapter
     private var firebaseUser: FirebaseUser? = null
+    private var callback: FragmentCallback? = null
 
-     var  doctorList: MutableList<Doctor> = mutableListOf()
+    var doctorList: MutableList<Doctor> = mutableListOf()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -289,5 +291,12 @@ class HomeFragment : Fragment() {
         ref.child(firebaseUser!!.uid).setValue(token1)
     }
 
+    override fun onCommandReceived(command: String) {
+        TODO("Not yet implemented")
+    }
+
+    fun setCallback(callback: FragmentCallback) {
+        this.callback = callback
+    }
 
 }
