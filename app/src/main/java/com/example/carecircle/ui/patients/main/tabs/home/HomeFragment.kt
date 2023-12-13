@@ -230,9 +230,11 @@ class HomeFragment : Fragment() {
                         }
                     }
                 }
+                val sortedDoctorList = doctorList.sortedByDescending { it.ratting }
+
                 // Update the data in the adapter
                 doctorsAadapter.doctorsList.clear()
-                doctorsAadapter.doctorsList.addAll(doctorList)
+                doctorsAadapter.doctorsList.addAll(sortedDoctorList)
                 doctorsAadapter.notifyDataSetChanged()
             }
 
