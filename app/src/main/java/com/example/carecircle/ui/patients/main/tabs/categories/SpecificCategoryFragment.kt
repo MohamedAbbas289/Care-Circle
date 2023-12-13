@@ -25,13 +25,13 @@ class SpecificCategoryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentSpecificCategoryBinding.inflate(inflater, container, false)
+        category = arguments?.getString("category") ?: ""
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        category = arguments?.getString("category") ?: ""
         initRecyclerView()
         loadUsersForCategory()
     }
