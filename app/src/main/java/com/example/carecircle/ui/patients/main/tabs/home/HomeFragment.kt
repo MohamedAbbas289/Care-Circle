@@ -39,7 +39,7 @@ import com.google.firebase.iid.FirebaseInstanceId
 import java.util.Locale
 
 
-class HomeFragment : Fragment(), FragmentCallback {
+class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private var categories: ArrayList<CategoryData> = ArrayList()
     lateinit var adapter: CategoriesAdapter
@@ -196,9 +196,6 @@ class HomeFragment : Fragment(), FragmentCallback {
         binding.seeAllTextView.text = spannableString
     }
 
-    // Inside your HomeFragment class
-
-// ...
 
     private fun fetchDataFromDatabase() {
         val databaseReference: DatabaseReference =
@@ -291,12 +288,6 @@ class HomeFragment : Fragment(), FragmentCallback {
         ref.child(firebaseUser!!.uid).setValue(token1)
     }
 
-    override fun onCommandReceived(command: String) {
-        TODO("Not yet implemented")
-    }
 
-    fun setCallback(callback: FragmentCallback) {
-        this.callback = callback
-    }
 
 }

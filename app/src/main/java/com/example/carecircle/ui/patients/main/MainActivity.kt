@@ -114,11 +114,9 @@ class MainActivity : AppCompatActivity(), FragmentCallback {
     }
 
     private fun showTabFragment(fragment: Fragment) {
-        if (fragment is HomeFragment) {
-            (fragment as HomeFragment).setCallback(this)
-        } else if (fragment is CategoriesFragment) {
-            (fragment as CategoriesFragment).setCallback(this)
-        }
+          if (fragment is CategoriesFragment) {
+              (fragment as CategoriesFragment).setCallback(this)
+          }
 
         supportFragmentManager
             .beginTransaction()
